@@ -10,12 +10,13 @@ namespace ApiTutorial.Controllers
 {
     public class ProductController : ApiController
     {
+        private ProductContext db = new ProductContext();
         [HttpGet]
         public IHttpActionResult Get()
         {
             IHttpActionResult ret = null;
             List<Product> list = new List<Product>();
-            list = CreateMockData();
+            list = db.Products.ToList();
             ret = Ok(list);
             return ret;
         }
@@ -57,8 +58,7 @@ namespace ApiTutorial.Controllers
             List<Product> list = new List<Product>();
             Product prod = new Product();
 
-            list = CreateMockData();
-            prod = list.Find(p => p.ProductId == id);
+            prod = db.Products.Where(p => p.ProductId == id).First();
             if (prod == null)
             {
                 ret = NotFound();
