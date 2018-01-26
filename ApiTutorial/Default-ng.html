@@ -111,7 +111,7 @@
 		});
 		
 		$scope.productGet = function(id){
-			$http.get("Product" + id + ".json").then(function(response){
+			$http.get("api/Product/" + id).then(function(response){
 				$scope.product = response.data;
 				$scope.product.IntroductionDate = new Date(response.data.IntroductionDate);
 				$scope.add = "Update";
