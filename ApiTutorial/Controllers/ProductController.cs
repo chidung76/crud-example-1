@@ -123,9 +123,10 @@ namespace ApiTutorial.Controllers
             return ret;
         }
 
-        public virtual new void Dispose()
+        protected override void Dispose(bool disposing)
         {
             db.Dispose();
+            base.Dispose(disposing);
         }
     }
 }

@@ -9,6 +9,9 @@
 	<!-- Latest compiled JavaScript -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.16/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="http://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
+
 </head>
 <body>
   <div class="container" ng-app="myApp" ng-controller="myCtrl">
@@ -18,20 +21,20 @@
       </div>
     </div>
 	<div class="row">
-	  <div class="col-sm-6">
+	  <div class="col-sm-9">
 		<table id="productTable"
 			   class="table table-bordered
 					 table-condensed table-striped">
 		  <thead>
+              <tr ng-show="loading" id="loading">
+                  <th colspan="100%"><img src="loader.gif"></th>
+              </tr>
 			<tr>
 			  <th>Product Name</th>
 			  <th>Introduction Date</th>
 			  <th>URL</th>
 			  <th>Edit</th>
 			  <th>Delete</th>
-			</tr>
-			<tr ng-show="loading" id="loading">
-				<td colspan="100%"><img src="loader.gif"></td>
 			</tr>
 		  </thead>
 		  <tbody>
@@ -102,14 +105,28 @@
   
 	<script>
 	var app = angular.module("myApp", []);
-	app.controller("myCtrl", function($scope, $http){
+	app.controller("myCtrl", function($scope, $http, $timeout){
 		$scope.add = "Add";
 		$scope.loading = true;
 		$http.get("api/Product").then(function(response){
-			$scope.products = response.data;
+		    $scope.products = response.data;
+		    $timeout(function () {
+		        $("#productTable").DataTable({
+                    lengthMenu : [2, 5]
+		        });
+		    });
 			$scope.loading = false;
 		});
 		
+		$scope.refreshTable = function () {
+		    $("#productTable").DataTable().destroy();
+		    $timeout(function () {
+		        $("#productTable").DataTable({
+		            lengthMenu: [2, 5]
+		        });
+		    });
+		};
+
 		$scope.productGet = function(id){
 			$http.get("api/Product/" + id).then(function(response){
 				$scope.product = response.data;
@@ -128,6 +145,7 @@
 			if ($scope.product.ProductId == 0){
 			    $http.post("api/Product", $scope.product).then(function (response) {
 			        $scope.products.push(response.data);
+			        $scope.refreshTable();
 			        $scope.addClick();
 			    });
 			}
@@ -136,6 +154,7 @@
 			        var index = $scope.products.findIndex(item => item.ProductId == $scope.product.ProductId);
 			        $scope.products[index] = $scope.product;
 			        $scope.addClick();
+			        $scope.refreshTable();
 			    });
 			}
 		};
@@ -144,6 +163,7 @@
 		    $http.delete("api/Product/" + id).then(function (response) {
 		        var index = $scope.products.findIndex(item => item.ProductId == id);
 		        $scope.products.splice(index, 1);
+		        $scope.refreshTable();
 		    });
 		};
 		$scope.product = new Object();
