@@ -132,17 +132,19 @@
 			    });
 			}
 			else{
-				// $http.put...
-				var index = $scope.products.findIndex(item => item.ProductId == $scope.product.ProductId);
-				$scope.products[index] = $scope.product;
-				$scope.addClick();
+			    $http.put("api/Product/" + $scope.product.ProductId, $scope.product).then(function (response) {
+			        var index = $scope.products.findIndex(item => item.ProductId == $scope.product.ProductId);
+			        $scope.products[index] = $scope.product;
+			        $scope.addClick();
+			    });
 			}
 		};
 		
 		$scope.productDelete = function (id){
-			// $http.delete("").then(...)
-				var index = $scope.products.findIndex(item => item.ProductId == id);
-				$scope.products.splice(index, 1);
+		    $http.delete("api/Product/" + id).then(function (response) {
+		        var index = $scope.products.findIndex(item => item.ProductId == id);
+		        $scope.products.splice(index, 1);
+		    });
 		};
 		$scope.product = new Object();
 		$scope.product.ProductId = 0;
